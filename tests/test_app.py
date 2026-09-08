@@ -29,7 +29,9 @@ def test_app_loads_at_slider_extremes():
     at.run(timeout=120)
     at.slider(key="n_kreuzungen_slider").set_value(8).run(timeout=120)
     assert not at.exception, [str(e) for e in at.exception]
-    at.slider(key="n_kreuzungen_slider").set_value(50).run(timeout=120)
+    at.slider(key="n_kreuzungen_slider").set_value(200).run(timeout=180)
+    assert not at.exception, [str(e) for e in at.exception]
+    at.slider(key="k_nachbarn_slider").set_value(6).run(timeout=180)
     assert not at.exception, [str(e) for e in at.exception]
     at.slider(key="anteil_hauptstrassen_slider").set_value(0).run(timeout=120)
     assert not at.exception, [str(e) for e in at.exception]

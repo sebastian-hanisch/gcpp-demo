@@ -104,3 +104,16 @@ def test_metaheuristik_erreicht_optimum_bei_kleinen_instanzen():
     exakt = loese(netz, "Exakt (Minimum-Weight Matching)").leerfahrten
     beste_meta = min(loese(netz, "Metaheuristik (Simulated Annealing)", seed=s).leerfahrten for s in range(10))
     assert beste_meta == pytest.approx(exakt, abs=1e-6)
+
+
+def test_metaheuristik_bleibt_bei_grossen_netzen_nah_am_optimum():
+    """Regressionstest: mit einem linear statt quadratisch skalierten
+    Iterationsbudget blieb die Metaheuristik bei 200 Kreuzungen (~100
+    ungerade Knoten) exakt bei der gierigen Lösung stehen (155% über dem
+    Optimum) - das Budget muss mit dem Quadrat der ungeraden Knotenzahl
+    wachsen, nicht linear (siehe `_paarung_metaheuristik`-Docstring)."""
+    netz = baue_strassennetz(200, 3, 0.2, seed=0)
+    ergebnisse = loese_alle(netz, seed=0)
+    exakt = ergebnisse["Exakt (Minimum-Weight Matching)"].leerfahrten
+    meta = ergebnisse["Metaheuristik (Simulated Annealing)"].leerfahrten
+    assert meta <= exakt * 1.1

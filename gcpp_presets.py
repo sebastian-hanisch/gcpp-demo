@@ -21,8 +21,8 @@ class SettingSpec:
 
 
 SETTING_SPECS = {
-    "n_kreuzungen_slider": SettingSpec("n", int, 20, 8, 50),
-    "k_nachbarn_slider": SettingSpec("k", int, 3, 2, 5),
+    "n_kreuzungen_slider": SettingSpec("n", int, 20, 8, 200),
+    "k_nachbarn_slider": SettingSpec("k", int, 3, 2, 6),
     # Prozent (ganzzahlig, 0-50) statt Anteil (0.0-0.5) - st.slider()s `format`
     # wendet das Format-Muster direkt auf den Rohwert an, "%.0f%%" auf 0.2
     # würde also "0%" anzeigen statt "20%".
