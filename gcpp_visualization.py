@@ -2,15 +2,21 @@
 Konvergenz- und Methodenvergleich.
 
 Zwei Layer pro Kantengruppe: eine dünne, sichtbare Linie (Farbe/Breite
-transportieren Information) und eine breite, unsichtbare "Hitbox"-Linie
-direkt darüber, die den Hover-Tooltip trägt - eine dünne 2px-Linie ist ein
-winziges Trefferziel für die Maus, die breite Hitbox macht das Hovern
-zuverlässig, ohne die Optik zu verändern. Gleichartige Kanten werden pro
-Kategorie zu EINER Trace zusammengefasst (None-getrennte Segmente) statt
+transportieren Information) und eine unsichtbare "Hitbox" aus dicht entlang
+jeder Kante VERTEILTEN PUNKTEN (nicht: einer breiten Linie!), die den
+Hover-Tooltip trägt. Plotly hovert bei Linien-Traces nach Distanz zum
+NÄCHSTEN DATENPUNKT, nicht interpoliert entlang der Strecke dazwischen -
+eine Kante hat aber nur 2 Punkte (die Endpunkte), sodass die Mitte einer
+längeren Kante selbst mit einer breiten Linie nie in Hover-Reichweite eines
+Punktes lag (live vom Nutzer bestätigt: Tooltips erschienen praktisch nie).
+Viele Zwischenpunkte pro Kante lösen das, weil Marker-Hover verlässlich
+punktbasiert funktioniert. Gleichartige Kanten werden pro Kategorie zu
+EINER sichtbaren Trace zusammengefasst (None-getrennte Segmente) statt
 einer Trace pro Kante - bei 100+ Kreuzungen sonst hunderte Einzel-Traces."""
 
 from collections import Counter
 
+import numpy as np
 import plotly.graph_objects as go
 
 from gcpp_model import Netzwerk
@@ -19,7 +25,8 @@ from gcpp_solver import Tour
 FARBE_PFLICHT_EINFACH = "#95a5a6"
 FARBE_PFLICHT_MEHRFACH = "#2980b9"
 FARBE_LEERFAHRT = "#e67e22"
-HITBOX_BREITE = 16
+HITBOX_PUNKTE_JE_KANTE = 8
+HITBOX_MARKERGROESSE = 14
 
 
 def _groessen_skalierung(n_knoten: int) -> tuple[float, float]:
@@ -30,18 +37,33 @@ def _groessen_skalierung(n_knoten: int) -> tuple[float, float]:
     return knoten_groesse, linien_basis
 
 
-def _segmente(kanten, netzwerk: Netzwerk, text_fn=None):
-    """Baut None-getrennte x/y(/hovertext)-Arrays für eine Gruppe von Kanten -
-    damit lässt sich eine ganze Kategorie in EINER Scatter-Trace zeichnen."""
-    xs, ys, texte = [], [], []
+def _segmente(kanten, netzwerk: Netzwerk):
+    """Baut None-getrennte x/y-Arrays für eine Gruppe von Kanten - damit
+    lässt sich eine ganze Kategorie in EINER sichtbaren Scatter-Trace zeichnen."""
+    xs, ys = [], []
     for k in kanten:
         k1, k2 = netzwerk.knoten[k.knoten1], netzwerk.knoten[k.knoten2]
         xs += [k1.x, k2.x, None]
         ys += [k1.y, k2.y, None]
-        if text_fn is not None:
-            t = text_fn(k)
-            texte += [t, t, None]
-    return (xs, ys, texte) if text_fn is not None else (xs, ys)
+    return xs, ys
+
+
+def _hitbox_trace(kanten, netzwerk: Netzwerk, text_fn) -> go.Scatter:
+    """Unsichtbare Marker-Punkte dicht entlang jeder Kante verteilt - siehe
+    Moduldocstring, warum das (statt einer breiten Linie) nötig ist."""
+    xs, ys, texte = [], [], []
+    t_werte = np.linspace(0.0, 1.0, HITBOX_PUNKTE_JE_KANTE)
+    for k in kanten:
+        k1, k2 = netzwerk.knoten[k.knoten1], netzwerk.knoten[k.knoten2]
+        text = text_fn(k)
+        for t in t_werte:
+            xs.append(k1.x + t * (k2.x - k1.x))
+            ys.append(k1.y + t * (k2.y - k1.y))
+            texte.append(text)
+    return go.Scatter(
+        x=xs, y=ys, mode="markers", marker=dict(size=HITBOX_MARKERGROESSE, color="rgba(0,0,0,0)"),
+        hoverinfo="text", hovertext=texte, showlegend=False,
+    )
 
 
 def _knoten_grade(netzwerk: Netzwerk) -> dict[int, int]:
@@ -65,6 +87,13 @@ def _hinzufuegen_knoten_trace(fig: go.Figure, netzwerk: Netzwerk, knoten_groesse
     )
 
 
+def _traversierungen(tour: Tour) -> Counter:
+    zaehler = Counter()
+    for u, v in tour.kreis:
+        zaehler[frozenset({u, v})] += 1
+    return zaehler
+
+
 def tour_figure(netzwerk: Netzwerk, tour: Tour, titel: str) -> go.Figure:
     fig = go.Figure()
     traversiert = _traversierungen(tour)
@@ -86,7 +115,7 @@ def tour_figure(netzwerk: Netzwerk, tour: Tour, titel: str) -> go.Figure:
         ("mehrfach", FARBE_PFLICHT_MEHRFACH, linien_basis * 1.6),
         ("leerfahrt", FARBE_LEERFAHRT, linien_basis * 1.8),
     ]
-    hitbox_x, hitbox_y, hitbox_text = [], [], []
+    text_lookup = {}
     for key, farbe, breite in kategorien:
         eintraege = gruppen[key]
         if not eintraege:
@@ -96,18 +125,9 @@ def tour_figure(netzwerk: Netzwerk, tour: Tour, titel: str) -> go.Figure:
             go.Scatter(x=xs, y=ys, mode="lines", line=dict(width=breite, color=farbe), hoverinfo="skip", showlegend=False)
         )
         for kante, gesamt, extra in eintraege:
-            k1, k2 = netzwerk.knoten[kante.knoten1], netzwerk.knoten[kante.knoten2]
-            text = f"Straße {kante.id}: Pflicht {kante.pflichtbesuche}x, befahren {gesamt}x" + (f" (+{extra} Leerfahrt)" if extra else "")
-            hitbox_x += [k1.x, k2.x, None]
-            hitbox_y += [k1.y, k2.y, None]
-            hitbox_text += [text, text, None]
+            text_lookup[kante.id] = f"Straße {kante.id}: Pflicht {kante.pflichtbesuche}x, befahren {gesamt}x" + (f" (+{extra} Leerfahrt)" if extra else "")
 
-    fig.add_trace(
-        go.Scatter(
-            x=hitbox_x, y=hitbox_y, mode="lines", line=dict(width=HITBOX_BREITE, color="rgba(0,0,0,0)"),
-            hoverinfo="text", hovertext=hitbox_text, showlegend=False,
-        )
-    )
+    fig.add_trace(_hitbox_trace(netzwerk.kanten, netzwerk, lambda k: text_lookup[k.id]))
     _hinzufuegen_knoten_trace(fig, netzwerk, knoten_groesse)
 
     # Legenden-Dummy-Traces (echte Kanten haben showlegend=False, damit die Legende nicht mit 100+ Einträgen zumüllt).
@@ -119,18 +139,11 @@ def tour_figure(netzwerk: Netzwerk, tour: Tour, titel: str) -> go.Figure:
 
     fig.update_layout(
         title=titel, xaxis=dict(scaleanchor="y", scaleratio=1, showgrid=False, zeroline=False, title="km"),
-        yaxis=dict(showgrid=False, zeroline=False, title="km"), height=520,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        margin=dict(l=20, r=20, t=50, b=20), hovermode="closest", hoverdistance=30,
+        yaxis=dict(showgrid=False, zeroline=False, title="km"), height=560,
+        legend=dict(orientation="h", yanchor="top", y=-0.12, x=0.5, xanchor="center"),
+        margin=dict(l=20, r=20, t=50, b=70), hovermode="closest",
     )
     return fig
-
-
-def _traversierungen(tour: Tour) -> Counter:
-    zaehler = Counter()
-    for u, v in tour.kreis:
-        zaehler[frozenset({u, v})] += 1
-    return zaehler
 
 
 def netzwerk_figure(netzwerk: Netzwerk, titel: str) -> go.Figure:
@@ -139,31 +152,19 @@ def netzwerk_figure(netzwerk: Netzwerk, titel: str) -> go.Figure:
 
     einfach = [k for k in netzwerk.kanten if k.pflichtbesuche == 1]
     mehrfach = [k for k in netzwerk.kanten if k.pflichtbesuche > 1]
-    hitbox_x, hitbox_y, hitbox_text = [], [], []
     for gruppe, farbe, breite in [(einfach, FARBE_PFLICHT_EINFACH, linien_basis), (mehrfach, FARBE_PFLICHT_MEHRFACH, linien_basis * 1.6)]:
         if not gruppe:
             continue
         xs, ys = _segmente(gruppe, netzwerk)
         fig.add_trace(go.Scatter(x=xs, y=ys, mode="lines", line=dict(width=breite, color=farbe), hoverinfo="skip", showlegend=False))
-        for k in gruppe:
-            k1, k2 = netzwerk.knoten[k.knoten1], netzwerk.knoten[k.knoten2]
-            text = f"Straße {k.id}: {k.pflichtbesuche}x Pflichträumung"
-            hitbox_x += [k1.x, k2.x, None]
-            hitbox_y += [k1.y, k2.y, None]
-            hitbox_text += [text, text, None]
 
-    fig.add_trace(
-        go.Scatter(
-            x=hitbox_x, y=hitbox_y, mode="lines", line=dict(width=HITBOX_BREITE, color="rgba(0,0,0,0)"),
-            hoverinfo="text", hovertext=hitbox_text, showlegend=False,
-        )
-    )
+    fig.add_trace(_hitbox_trace(netzwerk.kanten, netzwerk, lambda k: f"Straße {k.id}: {k.pflichtbesuche}x Pflichträumung"))
     _hinzufuegen_knoten_trace(fig, netzwerk, knoten_groesse)
 
     fig.update_layout(
         title=titel, xaxis=dict(scaleanchor="y", scaleratio=1, showgrid=False, zeroline=False, title="km"),
         yaxis=dict(showgrid=False, zeroline=False, title="km"), height=420,
-        margin=dict(l=20, r=20, t=50, b=20), hovermode="closest", hoverdistance=30,
+        margin=dict(l=20, r=20, t=50, b=20), hovermode="closest",
     )
     return fig
 
