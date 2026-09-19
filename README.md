@@ -1,5 +1,7 @@
 # 🚜 Winterdienst-Tourenplanung
 
+**[→ Demo live ausprobieren](https://sebastianhanisch-gcpp-demo.streamlit.app/)**
+
 Interaktive Demo zum (verallgemeinerten) Chinesischen Postbotenproblem: Ein Räumfahrzeug muss in seinem Bezirk jede Straße mindestens einmal räumen — Hauptstraßen sogar zweimal pro Schicht. Gesucht ist die kürzeste geschlossene Rundtour, die das erfüllt.
 
 ## Worum geht's?
