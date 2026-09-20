@@ -11,8 +11,10 @@ from gcpp_solver import loese
 from gcpp_visualization import (
     HITBOX_MARKERGROESSE,
     HITBOX_PUNKTE_JE_KANTE,
+    konvergenz_figure,
     netzwerk_figure,
     tour_figure,
+    vergleich_balken_figure,
 )
 
 
@@ -87,3 +89,19 @@ def test_legende_liegt_unterhalb_des_plots_nicht_ueber_dem_titel():
     tour = loese(netz, "Exakt (Minimum-Weight Matching)")
     fig = tour_figure(netz, tour, "Test")
     assert fig.layout.legend.y < 0
+
+
+def test_alle_figuren_sperren_zoom_und_pan_fuer_touch_scrolling():
+    """Portfolio-Konvention: fixedrange auf beiden Achsen, damit auf Touch-Geräten die Seite scrollt
+    statt dass das Diagramm die Geste abfängt (Hover-Tooltips bleiben davon unberührt)."""
+    netz = _kleines_netz()
+    tour = loese(netz, "Exakt (Minimum-Weight Matching)")
+    figuren = [
+        tour_figure(netz, tour, "Test"),
+        netzwerk_figure(netz, "Test"),
+        konvergenz_figure([3.0, 2.0, 1.5]),
+        vergleich_balken_figure({"Exakt": tour}),
+    ]
+    for fig in figuren:
+        assert fig.layout.xaxis.fixedrange is True
+        assert fig.layout.yaxis.fixedrange is True

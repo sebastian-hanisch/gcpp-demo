@@ -143,6 +143,11 @@ def tour_figure(netzwerk: Netzwerk, tour: Tour, titel: str) -> go.Figure:
         legend=dict(orientation="h", yanchor="top", y=-0.12, x=0.5, xanchor="center"),
         margin=dict(l=20, r=20, t=50, b=70), hovermode="closest",
     )
+    # fixedrange auf beiden Achsen: verhindert Pinch-Zoom/Drag-Pan im Chart,
+    # damit auf Touch-Geräten stattdessen die Seite normal gescrollt wird
+    # (Hover-Tooltips bleiben davon unberührt).
+    fig.update_xaxes(fixedrange=True)
+    fig.update_yaxes(fixedrange=True)
     return fig
 
 
@@ -166,6 +171,8 @@ def netzwerk_figure(netzwerk: Netzwerk, titel: str) -> go.Figure:
         yaxis=dict(showgrid=False, zeroline=False, title="km"), height=420,
         margin=dict(l=20, r=20, t=50, b=20), hovermode="closest",
     )
+    fig.update_xaxes(fixedrange=True)
+    fig.update_yaxes(fixedrange=True)
     return fig
 
 
@@ -176,6 +183,8 @@ def konvergenz_figure(verlauf: list[float]) -> go.Figure:
         xaxis_title="Iteration", yaxis_title="Leerfahrten [km]", height=340,
         margin=dict(l=20, r=20, t=50, b=20),
     )
+    fig.update_xaxes(fixedrange=True)
+    fig.update_yaxes(fixedrange=True)
     return fig
 
 
@@ -184,4 +193,6 @@ def vergleich_balken_figure(touren: dict[str, Tour]) -> go.Figure:
     leer = [touren[l].leerfahrten for l in labels]
     fig = go.Figure(go.Bar(x=labels, y=leer, marker_color="#e67e22", text=[f"{v:.1f} km" for v in leer], textposition="outside"))
     fig.update_layout(title="Leerfahrten-Distanz je Methode", yaxis_title="Leerfahrten [km]", height=360, margin=dict(l=20, r=20, t=50, b=20))
+    fig.update_xaxes(fixedrange=True)
+    fig.update_yaxes(fixedrange=True)
     return fig
