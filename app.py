@@ -75,19 +75,19 @@ st.caption("🎯 Schnellstart – ein Beispielszenario laden:")
 preset_col1, preset_col2, preset_col3 = st.columns(3)
 with preset_col1:
     st.button(
-        "🏘️ Kleines Wohnviertel", use_container_width=True,
+        "🏘️ Kleines Wohnviertel", width="stretch",
         on_click=apply_preset, args=(12, 3, 10, 4),
         help="Übersichtliches Netz - der Unterschied zwischen gieriger und exakter Paarung ist hier trotzdem deutlich sichtbar.",
     )
 with preset_col2:
     st.button(
-        "🏙️ Mittelgroßer Bezirk", use_container_width=True,
+        "🏙️ Mittelgroßer Bezirk", width="stretch",
         on_click=apply_preset, args=(24, 3, 20, 0),
         help="Realistischere Bezirksgröße mit einem Fünftel Hauptstraßen.",
     )
 with preset_col3:
     st.button(
-        "🌆 Große Stadt (viele Hauptstraßen)", use_container_width=True,
+        "🌆 Große Stadt (viele Hauptstraßen)", width="stretch",
         on_click=apply_preset, args=(40, 3, 35, 0),
         help="Großer Bezirk mit hohem Hauptstraßenanteil - testet, wie gut die Verfahren mit der Problemgröße skalieren.",
     )
@@ -119,7 +119,7 @@ with st.sidebar:
     seed_lo, seed_hi = bounds("seed_input")
     seed = st.number_input("Zufalls-Seed (Straßennetz & Metaheuristik)", min_value=seed_lo, max_value=seed_hi, step=1, key="seed_input")
     st.button(
-        "🎲 Neuen Bezirk generieren", use_container_width=True, on_click=randomize_seed,
+        "🎲 Neuen Bezirk generieren", width="stretch", on_click=randomize_seed,
         help="Würfelt einen neuen Zufalls-Seed - erzeugt ein neues Straßennetz UND eine neue Suchtrajektorie für die Metaheuristik.",
     )
 
@@ -142,7 +142,7 @@ m4.metric("Anzahl Straßen", f"{len(netzwerk.kanten)}")
 
 st.plotly_chart(
     tour_figure(netzwerk, exakt, f"Winterdienst-Bezirk ({n_kreuzungen} Kreuzungen) – exakte Rundtour"),
-    use_container_width=True, key="tour_main",
+    width="stretch", key="tour_main",
 )
 
 pdf_bytes = generate_tour_report_pdf(netzwerk, exakt)
@@ -195,7 +195,7 @@ else:
 st.markdown("---")
 
 with st.expander("🔧 Wie wir das erreichen – vollständiger Methodenvergleich", expanded=False):
-    st.plotly_chart(vergleich_balken_figure(touren), use_container_width=True, key="vergleich_balken")
+    st.plotly_chart(vergleich_balken_figure(touren), width="stretch", key="vergleich_balken")
     tabelle = pd.DataFrame(
         [
             {
@@ -207,7 +207,7 @@ with st.expander("🔧 Wie wir das erreichen – vollständiger Methodenvergleic
             for name in METHODEN_REIHENFOLGE
         ]
     )
-    st.dataframe(tabelle, use_container_width=True, hide_index=True)
+    st.dataframe(tabelle, width="stretch", hide_index=True)
 
     tab_labels = [METHODEN_TAB_LABEL[m] for m in METHODEN_REIHENFOLGE] + ["📊 Konvergenz"]
     tabs = st.tabs(tab_labels)
@@ -225,7 +225,7 @@ with st.expander("🔧 Wie wir das erreichen – vollständiger Methodenvergleic
             tm2.metric("Gesamtdistanz", f"{tour.gesamtdistanz:.1f} km")
             tm3.metric("Rechenzeit", f"{tour.rechenzeit*1000:.1f} ms")
             st.plotly_chart(
-                tour_figure(netzwerk, tour, name), use_container_width=True, key=f"tour_{name}",
+                tour_figure(netzwerk, tour, name), width="stretch", key=f"tour_{name}",
             )
 
     with tabs[-1]:
@@ -233,7 +233,7 @@ with st.expander("🔧 Wie wir das erreichen – vollständiger Methodenvergleic
             "Beste bisher gefundene Leerfahrten-Distanz je Iteration der Simulated-Annealing-Suche "
             "über den Raum aller Paarungen (Startpunkt: die gierige Paarung)."
         )
-        st.plotly_chart(konvergenz_figure(meta_verlauf), use_container_width=True, key="konvergenz")
+        st.plotly_chart(konvergenz_figure(meta_verlauf), width="stretch", key="konvergenz")
 
 st.markdown("---")
 
