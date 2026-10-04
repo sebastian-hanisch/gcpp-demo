@@ -8,7 +8,7 @@ Interaktive Demo zum (verallgemeinerten) Chinesischen Postbotenproblem: Ein Räu
 
 Logistik-Anwendung des Eulerpfad-Klassikers "Haus vom Nikolaus" (dort: jede Kante genau 1x) auf beliebige Pflicht-Häufigkeiten je Straße — in der Literatur das **Chinesische Postbotenproblem** (Route Inspection Problem). Dieselbe Modellierung passt auf Straßenreinigung, Briefzustellung oder Zählerablesung — überall dort, wo ein Fahrzeug jede Kante eines Netzwerks bedienen muss, statt nur bestimmte Punkte anzufahren (der Unterschied zum klassischen Fahrzeugrouting in `vrp_demo`).
 
-Kernthema der Demo: Anders als die meisten Tourenplanungsprobleme in diesem Portfolio (z. B. `vrp_demo`) ist dieses Problem — alle Straßen sind Pflicht — **polynomiell exakt lösbar** (Edmonds & Johnson 1973). Der Trick steckt allein darin, wie man die Kreuzungen mit ungerader Straßenanzahl paart, um das Netzwerk "eulersch" zu machen. Eine naive Paarung nach Luftlinie kann dabei deutlich schlechter sein als die mathematisch optimale Paarung — bei den zufällig gestreuten Straßennetzen dieser Demo tritt das schon bei kleinen bis mittleren Bezirksgrößen zuverlässig auf.
+Kernthema der Demo: Anders als die meisten Tourenplanungsprobleme in diesem Portfolio (z. B. `vrp_demo`) ist dieses Problem — alle Straßen sind Pflicht — **polynomiell exakt lösbar** (Edmonds & Johnson 1973). Der Trick steckt allein darin, wie man die Kreuzungen mit ungerader Straßenanzahl paart, um das Netzwerk "eulersch" zu machen. Eine naive Paarung nach Luftlinie kann dabei deutlich schlechter sein als die mathematisch optimale Paarung — bei den zufällig gestreuten Straßennetzen dieser Demo tritt das schon bei kleinen bis mittleren Bezirksgrößen regelmäßig auf.
 
 Schwesterdemo zu [arc-routing-demo](https://github.com/sebastian-hanisch/arc-routing-demo) (dasselbe Lösungsverfahren, aber mit festen, aus der Strukturoptimierungs-Linie übernommenen Netzen statt frei einstellbarer Problemgröße) und Gegenstück zu [vrp_demo](https://github.com/sebastian-hanisch/vrp_demo) im Sinne von Kantenrouting (jede Straße bedienen) vs. Knotenrouting (bestimmte Stopps anfahren).
 
@@ -33,4 +33,4 @@ Tests: `pytest tests/ -v`
 
 ---
 
-Teil des [Operations-Research-Demo-Portfolios](https://sebastianhanisch.net/demos.html) von [Sebastian Hanisch](https://sebastianhanisch.net) — Operations Research und Machine Learning. Interesse an einer maßgeschneiderten Lösung? [Kontakt aufnehmen](https://sebastianhanisch.net/kontakt.html).
+Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zum Thema: [Tourenplanung optimieren](https://sebastianhanisch.net/tourenplanung-optimierung.html).

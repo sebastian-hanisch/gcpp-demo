@@ -214,7 +214,7 @@ with st.expander("🔧 Wie wir das erreichen – vollständiger Methodenvergleic
     beschreibungen = {
         "Gierige Paarung": "Paart ungerade Kreuzungen nach Luftliniendistanz - schnell, aber ohne Rücksicht auf den tatsächlichen Straßen-Umweg.",
         "Exakt (Minimum-Weight Matching)": "Minimum-Weight Perfect Matching (Edmonds & Johnson 1973) auf den echten kürzesten Straßennetz-Wegen zwischen den ungeraden Kreuzungen - beweisbar optimal.",
-        "Metaheuristik (Simulated Annealing)": "Lokale Suche über den Raum aller Paarungen, startend bei der gierigen Lösung - trifft bei diesen Problemgrößen praktisch immer dieselbe Paarung wie das exakte Verfahren, aber ohne Optimalitätsgarantie.",
+        "Metaheuristik (Simulated Annealing)": "Lokale Suche über den Raum aller Paarungen, startend bei der gierigen Lösung - trifft bei kleinen bis mittleren Netzen (bis etwa 40 Kreuzungen) fast immer dieselbe Paarung wie das exakte Verfahren, bleibt bei sehr großen Netzen aber meist knapp darüber - ohne Optimalitätsgarantie.",
     }
     for tab, name in zip(tabs[:-1], METHODEN_REIHENFOLGE):
         with tab:
@@ -331,13 +331,13 @@ Gerüst - die drei Methoden unterscheiden sich AUSSCHLIESSLICH in Schritt 4 (`_p
 Paarungs-Vertauschungen).
 
 **Quelle:** J. Edmonds, E. L. Johnson. *Matching, Euler tours and the Chinese postman.*
-Mathematical Programming, Volume 5, Issue 1 (1973), 111-114.
+Mathematical Programming, Volume 5, Issue 1 (1973), 88-124.
 """
     )
 
 st.markdown("---")
 st.caption(
     "Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – "
-    "Operations Research und Machine Learning. Interesse an einer maßgeschneiderten Lösung für "
-    "Ihr Unternehmen? [Kontakt aufnehmen](https://sebastianhanisch.net/kontakt.html)"
+    "Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). "
+    "Mehr zum Thema: [Tourenplanung optimieren](https://sebastianhanisch.net/tourenplanung-optimierung.html)."
 )
