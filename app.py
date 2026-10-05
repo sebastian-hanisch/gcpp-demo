@@ -214,7 +214,7 @@ with st.expander("🔧 Wie wir das erreichen – vollständiger Methodenvergleic
     beschreibungen = {
         "Gierige Paarung": "Paart ungerade Kreuzungen nach Luftliniendistanz - schnell, aber ohne Rücksicht auf den tatsächlichen Straßen-Umweg.",
         "Exakt (Minimum-Weight Matching)": "Minimum-Weight Perfect Matching (Edmonds & Johnson 1973) auf den echten kürzesten Straßennetz-Wegen zwischen den ungeraden Kreuzungen - beweisbar optimal.",
-        "Metaheuristik (Simulated Annealing)": "Lokale Suche über den Raum aller Paarungen, startend bei der gierigen Lösung - trifft bei kleinen bis mittleren Netzen (bis etwa 40 Kreuzungen) fast immer dieselbe Paarung wie das exakte Verfahren, bleibt bei sehr großen Netzen aber meist knapp darüber - ohne Optimalitätsgarantie.",
+        "Metaheuristik (Simulated Annealing)": "Lokale Suche über den Raum aller Paarungen, startend bei der gierigen Lösung - trifft bei kleinen bis mittleren Netzen (bis etwa 40 Kreuzungen) fast immer dieselbe Paarung wie das exakte Verfahren (299 von 300 geprüften Netzen), bleibt bei sehr großen Netzen (100 bis 200 Kreuzungen) aber oft darüber (in 30 geprüften Netzen 14-mal exakt gleich, sonst bis etwa 17 % mehr Leerfahrten) - ohne Optimalitätsgarantie.",
     }
     for tab, name in zip(tabs[:-1], METHODEN_REIHENFOLGE):
         with tab:
