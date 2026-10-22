@@ -10,7 +10,7 @@ Logistik-Anwendung des Eulerpfad-Klassikers "Haus vom Nikolaus" (dort: jede Kant
 
 Kernthema der Demo: Anders als die meisten Tourenplanungsprobleme in diesem Portfolio (z. B. `vrp_demo`) ist dieses Problem — alle Straßen sind Pflicht — **polynomiell exakt lösbar** (Edmonds & Johnson 1973). Der Trick steckt allein darin, wie man die Kreuzungen mit ungerader Straßenanzahl paart, um das Netzwerk "eulersch" zu machen. Eine naive Paarung nach Luftlinie kann dabei deutlich schlechter sein als die mathematisch optimale Paarung — bei den zufällig gestreuten Straßennetzen dieser Demo tritt das schon bei kleinen bis mittleren Bezirksgrößen regelmäßig auf.
 
-Schwesterdemo zu [arc-routing-demo](https://github.com/sebastian-hanisch/arc-routing-demo) (dasselbe Lösungsverfahren, aber mit festen, aus der Strukturoptimierungs-Linie übernommenen Netzen statt frei einstellbarer Problemgröße) und Gegenstück zu [vrp_demo](https://github.com/sebastian-hanisch/vrp_demo) im Sinne von Kantenrouting (jede Straße bedienen) vs. Knotenrouting (bestimmte Stopps anfahren).
+Schwesterdemo zu [arc-routing-demo](https://github.com/sebastian-hanisch/arc-routing-demo) (dasselbe Lösungsverfahren, aber mit festen, aus der Strukturoptimierungs-Linie übernommenen Netzen statt frei einstellbarer Problemgröße) und Gegenstück zu [vrp-demo](https://github.com/sebastian-hanisch/vrp-demo) im Sinne von Kantenrouting (jede Straße bedienen) vs. Knotenrouting (bestimmte Stopps anfahren).
 
 ## Methodik
 
