@@ -71,6 +71,17 @@ Formulierung".
 """
 )
 
+# erklaerseite:einfach:start (erzeugt von tools/set_demo_explainer.py (Website-Repo) aus tools/content/explainers/winterdienst-touren-erklaert.json, nicht von Hand ändern)
+with st.expander("💬 In einfachen Worten"):
+    st.markdown(
+        """
+Ein Räumfahrzeug muss in seinem Bezirk **jede Straße** befahren, die Hauptstraßen zweimal, und am Ende zum Ausgangspunkt zurückkehren. Gesucht ist die kürzeste solche **Rundtour**. Die Pflichtstrecke steht fest. Sparen lässt sich nur bei den **Leerfahrten**, den Wegen, auf denen nichts Neues geräumt wird. Sie sind nötig, weil an manchen Kreuzungen eine ungerade Zahl von Pflichtfahrten endet. Diese **ungeraden Kreuzungen** muss man paarweise durch Zusatzwege verbinden. Die Demo vergleicht auf zufällig erzeugten Straßennetzen eine gierige Paarung nach Luftlinie, eine exakte Paarung und ein Suchverfahren. So zeigt sie, wie viel Leerfahrt die einfache Regel gegenüber der besten Paarung verschenken kann.
+
+[Ausführlich und verständlich erklärt, mit Fachteil](https://sebastianhanisch.net/winterdienst-touren-erklaert.html)
+        """
+    )
+# erklaerseite:einfach:end
+
 st.caption("🎯 Schnellstart – ein Beispielszenario laden:")
 preset_col1, preset_col2, preset_col3 = st.columns(3)
 with preset_col1:
@@ -166,7 +177,9 @@ zwischen den Kreuzungen mit ungerader Straßenanzahl einfügen, bis das Netzwerk
 hat (Satz von Euler). Die **gierige Paarung** wählt dafür naiv die Kreuzung, die auf dem Stadtplan am
 nächsten liegt (Luftlinie) - ohne zu prüfen, wie weit der tatsächliche Weg durchs Straßennetz ist.
 Liegen zwei Kreuzungen räumlich nah, sind aber nur über einen Umweg verbunden (z. B. weil kein
-direkter Durchgangsweg existiert), kann das teuer werden.
+direkter Durchgangsweg existiert), kann das teuer werden. Der Rückstand der gierigen Paarung hat
+aber zwei Ursachen: die Luftlinie statt des Straßenwegs und die Reihenfolge der gierigen Regel (eine früh
+gewählte nahe Paarung kann später übrig gebliebenen Kreuzungen lange Wege aufzwingen).
 """
 )
 
@@ -184,12 +197,12 @@ c2.metric(
 if gap_pct > 5.0:
     st.warning(
         f"⚠️ In diesem Bezirk fährt die gierige Paarung **{gap_pct:.0f}%** mehr Leerfahrten als "
-        "nötig - ein Hinweis darauf, dass Luftlinien- und Netzwerkdistanz hier auseinanderfallen."
+        "nötig - ein Hinweis auf die Luftlinie und die Reihenfolge der gierigen Regel (Luftlinien- und Netzwerkdistanz können hier auseinanderfallen)."
     )
 else:
     st.success(
         f"✅ In diesem Bezirk liegt die gierige Paarung nur **{max(gap_pct, 0):.0f}%** über dem "
-        "Optimum - hier stimmen Luftlinien- und Netzwerkdistanz weitgehend überein."
+        "Optimum - hier fallen Luftlinie und Reihenfolge der gierigen Regel kaum ins Gewicht."
     )
 
 st.markdown("---")
@@ -276,6 +289,10 @@ einer der wenigen Fälle, in denen "exakt" nicht "langsam" bedeutet.
 Kreuzungen verbindet, ohne den tatsächlichen Weg durchs Straßennetz nachzurechnen. Fallen Luftlinien-
 und Netzwerkdistanz auseinander, erzwingt das teure Fehlentscheidungen - bei den zufällig gestreuten
 Straßennetzen dieser Demo tritt das schon bei kleinen bis mittleren Bezirksgrößen regelmäßig auf.
+Dazu kommt ein zweiter Effekt: die Reihenfolge der gierigen Regel. Auch mit Straßenweg statt Luftlinie
+bliebe die gierige Paarung bei 20 Kreuzungen in 73 von 100 Netzen länger als die exakte (Mittel 23,6 %
+gegen 37,7 % mit Luftlinie), eine reihenfolgefreie Variante bleibt bei 19,8 % - der Rückstand beruht also
+nicht allein auf Luftlinie gegen Straßenweg.
 
 **Wichtiger Modellierungshinweis:** `networkx` bringt mit `eulerize()` eine fertige Funktion für
 genau dieses Problem mit - ein Blick in den Quellcode zeigt aber, dass sie Knoten nach
@@ -286,6 +303,25 @@ Matching-Aufbau verwendet (`gcpp_solver.py`) statt sich auf `eulerize()` zu verl
     )
 
 with st.expander("📐 Mathematische Formulierung"):
+    # erklaerseite:lesehilfe:start (erzeugt von tools/set_demo_explainer.py (Website-Repo) aus tools/content/explainers/winterdienst-touren-erklaert.json, nicht von Hand ändern)
+    st.markdown(
+        r"""
+**Lesehilfe.** Gegeben ist ein zusammenhängendes Straßennetz aus Kreuzungen und Straßen mit Längen und Pflichtzahlen (einmal oder zweimal räumen). Gesucht ist eine geschlossene Rundtour minimaler Länge, die jede Straße mindestens so oft befährt, wie ihre Pflichtzahl verlangt.
+
+| Symbol | Bedeutung |
+|---|---|
+| $G=(V,E)$ | Straßennetz mit Kreuzungen $V$ und Straßen $E$ |
+| $\ell_e$ | Länge der Straße $e$ |
+| $r_e$ | Pflichtzahl der Straße $e$ (einmal oder zweimal räumen) |
+| $x_e$ | Zahl der Durchfahrten der Straße $e$ in der Tour |
+| $T$ | ungerade Kreuzungen: dort endet eine ungerade Zahl von Pflichtfahrten |
+| $d(u,v)$ | Länge des kürzesten Wegs zwischen den Kreuzungen $u$ und $v$ |
+| $M$ | Paarung der Kreuzungen aus $T$ (jede genau einmal) |
+
+[Schritt für Schritt erklärt, mit Herleitung und Literatur](https://sebastianhanisch.net/winterdienst-touren-erklaert.html#fachleute)
+        """
+    )
+    # erklaerseite:lesehilfe:end
     st.markdown(
         r"""
 Gegeben ein zusammenhängender, ungerichteter Graph $G=(V,E)$ mit Kantenlängen $\ell_e > 0$ und
